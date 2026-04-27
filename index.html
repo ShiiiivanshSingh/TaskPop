@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8">
@@ -7,6 +7,1018 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=Syne:wght@400;500;600;700;800&family=Syne+Mono&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TaskPop — Notes & Tasks</title>
+  <meta name="description" content="A minimal note-taking and to-do app. Zero distraction. Pure clarity.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ─── RESET ─────────────────────────────────────── */
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: #000;
+      color: #fff;
+      min-height: 100vh;
+    }
+
+    input,
+    textarea,
+    button {
+      font-family: inherit;
+      font-size: inherit;
+      outline: none;
+      border: none;
+      background: none;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    ul {
+      list-style: none;
+    }
+
+    /* ─── LAYOUT ─────────────────────────────────────── */
+    .app {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 0 24px 120px;
+    }
+
+    /* ─── HEADER ─────────────────────────────────────── */
+    .header {
+      padding: 48px 0 32px;
+      border-bottom: 2px solid #fff;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+    }
+
+    .header-title {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .header-count {
+      font-size: 13px;
+      font-weight: 400;
+      color: #666;
+      letter-spacing: 0.05em;
+    }
+
+    /* ─── SEARCH ─────────────────────────────────────── */
+    .search-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 0;
+      border-bottom: 1px solid #222;
+    }
+
+    .search-icon {
+      flex-shrink: 0;
+      opacity: 0.4;
+      stroke: #fff;
+    }
+
+    .search-input {
+      flex: 1;
+      font-size: 15px;
+      font-weight: 400;
+      color: #fff;
+      caret-color: #fff;
+    }
+
+    .search-input::placeholder {
+      color: #444;
+      font-weight: 400;
+    }
+
+    .search-clear {
+      font-size: 12px;
+      font-weight: 500;
+      color: #555;
+      letter-spacing: 0.05em;
+      display: none;
+      padding: 2px 0;
+    }
+
+    .search-clear.visible {
+      display: block;
+    }
+
+    .search-clear:hover {
+      color: #fff;
+    }
+
+    /* ─── SECTION LABEL ──────────────────────────────── */
+    .section-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #444;
+      padding: 24px 0 10px;
+    }
+
+    /* ─── ITEM LIST ───────────────────────────────────── */
+    .item-list {
+      margin: 0;
+    }
+
+    /* ─── TASK ITEM ───────────────────────────────────── */
+    .item {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 18px 0;
+      border-bottom: 1px solid #1a1a1a;
+      position: relative;
+    }
+
+    .item:last-child {
+      border-bottom: none;
+    }
+
+    /* ─── NOTE ITEM ───────────────────────────────────── */
+    .item.note-item {
+      padding: 18px 0 18px 18px;
+      border-left: 2px solid #fff;
+      margin-left: 0;
+    }
+
+    /* Checkbox */
+    .item-check {
+      width: 20px;
+      height: 20px;
+      border: 1.5px solid #fff;
+      border-radius: 2px;
+      flex-shrink: 0;
+      margin-top: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+
+    .item-check:hover {
+      background: #1a1a1a;
+    }
+
+    .item.done .item-check {
+      background: #fff;
+    }
+
+    .item-check svg {
+      display: none;
+    }
+
+    .item.done .item-check svg {
+      display: block;
+    }
+
+    /* Task text */
+    .item-body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .item-text {
+      font-size: 16px;
+      font-weight: 500;
+      line-height: 1.5;
+      color: #fff;
+      word-break: break-word;
+      cursor: text;
+    }
+
+    .item.done .item-text {
+      color: #444;
+      font-weight: 400;
+      text-decoration: line-through;
+      text-decoration-color: #444;
+    }
+
+    /* Note type: no checkbox, just body */
+    .item.note-item .item-check {
+      display: none;
+    }
+
+    .item.note-item .item-body {
+      padding-left: 0;
+    }
+
+    .item-meta {
+      font-size: 11px;
+      font-weight: 400;
+      color: #555;
+      margin-top: 5px;
+      letter-spacing: 0.02em;
+    }
+
+    .item-type-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #555;
+      margin-right: 6px;
+    }
+
+    /* Note text shows more lines */
+    .item.note-item .item-text {
+      font-weight: 400;
+      white-space: pre-wrap;
+      display: -webkit-box;
+      -webkit-line-clamp: 5;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      line-height: 1.6;
+    }
+
+    .item.note-item.editing .item-text {
+      -webkit-line-clamp: unset;
+      overflow: visible;
+    }
+
+    /* Delete button */
+    .item-del {
+      opacity: 0;
+      flex-shrink: 0;
+      padding: 2px 4px;
+      margin-top: 1px;
+      color: #444;
+      transition: opacity 0.1s, color 0.1s;
+      display: flex;
+      align-items: center;
+    }
+
+    .item:hover .item-del {
+      opacity: 1;
+    }
+
+    .item-del:hover {
+      color: #fff;
+    }
+
+    .item-del svg {
+      width: 13px;
+      height: 13px;
+      stroke: currentColor;
+      fill: none;
+    }
+
+    /* Inline edit textarea */
+    .item-edit {
+      display: block;
+      width: 100%;
+      font-size: 16px;
+      font-weight: 500;
+      line-height: 1.5;
+      color: #fff;
+      caret-color: #fff;
+      background: transparent;
+      resize: none;
+      border-bottom: 1.5px solid #fff;
+      padding: 2px 0 4px;
+      overflow: hidden;
+    }
+
+    .item-edit:focus {
+      border-bottom-color: #fff;
+    }
+
+    /* ─── EMPTY STATE ─────────────────────────────────── */
+    .empty {
+      padding: 56px 0;
+      text-align: center;
+    }
+
+    .empty-text {
+      font-size: 15px;
+      font-weight: 400;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    /* ─── FAB ─────────────────────────────────────────── */
+    .fab {
+      position: fixed;
+      bottom: 36px;
+      right: 36px;
+      width: 52px;
+      height: 52px;
+      background: #fff;
+      color: #000;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: 300;
+      line-height: 1;
+      z-index: 100;
+      transition: transform 0.15s;
+      box-shadow: none;
+    }
+
+    .fab:hover {
+      transform: scale(1.08);
+    }
+
+    .fab.open {
+      transform: rotate(45deg);
+    }
+
+    /* ─── ADD PANEL ───────────────────────────────────── */
+    .add-panel {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #0d0d0d;
+      border-top: 2px solid #fff;
+      padding: 0 24px 32px;
+      z-index: 99;
+      transform: translateY(100%);
+      transition: transform 0.18s ease;
+    }
+
+    .add-panel.open {
+      transform: translateY(0);
+    }
+
+    .add-panel-inner {
+      max-width: 592px;
+      margin: 0 auto;
+    }
+
+    /* Panel top row: type toggles + close */
+    .add-panel-top {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #222;
+      padding-top: 0;
+    }
+
+    .add-type-row {
+      display: flex;
+      flex: 1;
+      gap: 0;
+      border: none;
+    }
+
+    .add-type-btn {
+      flex: 1;
+      padding: 16px 0;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #444;
+      border: none;
+      border-bottom: 3px solid transparent;
+      transition: color 0.1s, border-color 0.1s;
+      background: none;
+    }
+
+    .add-type-btn:last-child {
+      border-right: none;
+    }
+
+    .add-type-btn.active {
+      color: #fff;
+      border-bottom-color: #fff;
+    }
+
+    /* Close button inside panel */
+    .add-close {
+      padding: 16px 4px 16px 20px;
+      font-size: 22px;
+      font-weight: 300;
+      color: #444;
+      line-height: 1;
+      background: none;
+      border: none;
+      flex-shrink: 0;
+      transition: color 0.1s;
+    }
+
+    .add-close:hover {
+      color: #fff;
+    }
+
+    .add-input-wrap {
+      position: relative;
+    }
+
+    .add-text {
+      display: block;
+      width: 100%;
+      font-size: 17px;
+      font-weight: 500;
+      color: #fff;
+      caret-color: #fff;
+      background: transparent;
+      border: none;
+      border-bottom: 1.5px solid #333;
+      padding: 10px 0 14px;
+      line-height: 1.7;
+      resize: none;
+      min-height: 100px;
+    }
+
+    .add-text:focus {
+      border-bottom-color: #fff;
+    }
+
+    .add-text::placeholder {
+      color: #333;
+      font-weight: 400;
+    }
+
+    .add-footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .add-hint {
+      font-size: 11px;
+      font-weight: 400;
+      color: #444;
+      letter-spacing: 0.04em;
+      flex: 1;
+    }
+
+    .add-submit {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #000;
+      background: #fff;
+      padding: 11px 28px;
+      flex-shrink: 0;
+    }
+
+    .add-submit:hover {
+      opacity: 0.8;
+    }
+
+    .add-submit:disabled {
+      opacity: 0.25;
+      cursor: default;
+    }
+
+    /* ─── UNDO TOAST ──────────────────────────────────── */
+    .toast {
+      position: fixed;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%) translateY(10px);
+      background: #111;
+      border: 1px solid #333;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.15s, transform 0.15s;
+      z-index: 200;
+    }
+
+    .toast.visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+      pointer-events: auto;
+    }
+
+    .toast-undo {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #fff;
+      text-decoration: underline;
+      cursor: pointer;
+      background: none;
+      padding: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+
+    <!-- Header -->
+    <header class="header">
+      <span class="header-title">TaskPop</span>
+      <span class="header-count" id="headerCount"></span>
+    </header>
+
+    <!-- Search -->
+    <div class="search-bar">
+      <svg class="search-icon" width="15" height="15" viewBox="0 0 14 14" fill="none" stroke="#fff" stroke-width="1.5">
+        <circle cx="6" cy="6" r="4.5" />
+        <line x1="9.5" y1="9.5" x2="13" y2="13" />
+      </svg>
+      <input id="searchInput" class="search-input" type="text" placeholder="Search…" autocomplete="off"
+        spellcheck="false">
+      <button id="searchClear" class="search-clear" aria-label="Clear search">Clear</button>
+    </div>
+
+    <!-- List -->
+    <div id="listContainer">
+      <!-- Tasks section -->
+      <div class="section-label" id="tasksLabel" style="display:none">Tasks</div>
+      <ul class="item-list" id="taskList"></ul>
+
+      <!-- Notes section -->
+      <div class="section-label" id="notesLabel" style="display:none">Notes</div>
+      <ul class="item-list" id="noteList"></ul>
+
+      <div class="empty" id="emptyState" style="display:none">
+        <p class="empty-text">Nothing here.<br>Tap + to add a note or task.</p>
+      </div>
+
+      <div class="empty" id="emptySearch" style="display:none">
+        <p class="empty-text">No results.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FAB -->
+  <button class="fab" id="fab" aria-label="Add item">+</button>
+
+  <!-- Add Panel -->
+  <div class="add-panel" id="addPanel" role="dialog" aria-label="Add note or task">
+    <div class="add-panel-inner">
+      <div class="add-panel-top">
+        <div class="add-type-row">
+          <button class="add-type-btn active" id="typeTask" data-type="task">Task</button>
+          <button class="add-type-btn" id="typeNote" data-type="note">Note</button>
+        </div>
+        <button class="add-close" id="addClose" aria-label="Close">&#x2715;</button>
+      </div>
+      <div class="add-input-wrap">
+        <textarea id="addText" class="add-text" rows="4" placeholder="What needs to be done?" autocomplete="off"
+          spellcheck="false"></textarea>
+      </div>
+      <div class="add-footer">
+        <span class="add-hint" id="addHint">Enter to save &middot; Esc to close</span>
+        <button class="add-submit" id="addSubmit" disabled>Add</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Undo Toast -->
+  <div class="toast" id="toast" role="status" aria-live="polite">
+    <span id="toastMsg">Deleted</span>
+    <button class="toast-undo" id="toastUndo">Undo</button>
+  </div>
+
+  <script>
+    /* ─── STATE ─────────────────────────────────────────── */
+    const STORAGE_KEY = 'taskpop_v2';
+    let items = [];         // { id, type, text, done, createdAt }
+    let searchQuery = '';
+    let activeType = 'task';
+    let panelOpen = false;
+    let undoStack = null;   // last deleted item + index
+    let toastTimer = null;
+    let editingId = null;
+
+    /* ─── PERSISTENCE ────────────────────────────────────── */
+    function load() {
+      try { items = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+      catch { items = []; }
+    }
+    function save() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    }
+
+    /* ─── UTILS ──────────────────────────────────────────── */
+    function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+
+    function isToday(ts) {
+      const d = new Date(ts), n = new Date();
+      return d.getFullYear() === n.getFullYear() && d.getMonth() === n.getMonth() && d.getDate() === n.getDate();
+    }
+
+    function fmt(ts) {
+      const d = new Date(ts);
+      if (isToday(ts)) {
+        return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      }
+      return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+    }
+
+    function matchSearch(item) {
+      if (!searchQuery) return true;
+      return item.text.toLowerCase().includes(searchQuery.toLowerCase());
+    }
+
+    /* ─── RENDER ─────────────────────────────────────────── */
+    function renderAll() {
+      const filtered = items.filter(matchSearch);
+      const tasks = filtered.filter(i => i.type === 'task');
+      const notes = filtered.filter(i => i.type === 'note');
+
+      renderList(document.getElementById('taskList'), tasks);
+      renderList(document.getElementById('noteList'), notes);
+
+      document.getElementById('tasksLabel').style.display = tasks.length ? '' : 'none';
+      document.getElementById('notesLabel').style.display = notes.length ? '' : 'none';
+
+      const isEmpty = items.length === 0;
+      const noResults = items.length > 0 && filtered.length === 0;
+
+      document.getElementById('emptyState').style.display = isEmpty ? '' : 'none';
+      document.getElementById('emptySearch').style.display = noResults ? '' : 'none';
+
+      // Header count
+      const total = items.length;
+      const done = items.filter(i => i.done).length;
+      const countEl = document.getElementById('headerCount');
+      if (total === 0) { countEl.textContent = ''; }
+      else if (done === 0) { countEl.textContent = `${total} item${total !== 1 ? 's' : ''}`; }
+      else { countEl.textContent = `${done} / ${total} done`; }
+    }
+
+    function renderList(ul, list) {
+      ul.innerHTML = '';
+      list.forEach(item => {
+        const li = buildItemEl(item);
+        ul.appendChild(li);
+      });
+    }
+
+    function buildItemEl(item) {
+      const li = document.createElement('li');
+      li.className = 'item' + (item.done ? ' done' : '') + (item.type === 'note' ? ' note-item' : '');
+      li.dataset.id = item.id;
+
+      if (item.type === 'task') {
+        // Checkbox
+        const check = document.createElement('button');
+        check.className = 'item-check';
+        check.setAttribute('aria-label', item.done ? 'Mark incomplete' : 'Mark complete');
+        check.innerHTML = `<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><polyline points="1,4 4,7 9,1" stroke="#000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+        check.addEventListener('click', () => toggleDone(item.id));
+        li.appendChild(check);
+      }
+
+      // Body
+      const body = document.createElement('div');
+      body.className = 'item-body';
+
+      const textEl = document.createElement('div');
+      textEl.className = 'item-text';
+      textEl.textContent = item.text;
+      textEl.setAttribute('role', 'button');
+      textEl.setAttribute('tabindex', '0');
+      textEl.addEventListener('click', () => startEdit(item.id, li));
+      textEl.addEventListener('keydown', e => { if (e.key === 'Enter') startEdit(item.id, li); });
+
+      const meta = document.createElement('div');
+      meta.className = 'item-meta';
+
+      if (item.type === 'note') {
+        const badge = document.createElement('span');
+        badge.className = 'item-type-badge';
+        badge.textContent = 'Note';
+        meta.appendChild(badge);
+      }
+
+      const timeSpan = document.createTextNode(fmt(item.createdAt));
+      meta.appendChild(timeSpan);
+
+      body.appendChild(textEl);
+      body.appendChild(meta);
+      li.appendChild(body);
+
+      // Delete
+      const del = document.createElement('button');
+      del.className = 'item-del';
+      del.setAttribute('aria-label', 'Delete');
+      del.innerHTML = `<svg width="12" height="12" viewBox="0 0 12 12" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"><line x1="2" y1="2" x2="10" y2="10"/><line x1="10" y1="2" x2="2" y2="10"/></svg>`;
+      del.addEventListener('click', () => deleteItem(item.id));
+      li.appendChild(del);
+
+      return li;
+    }
+
+    /* ─── ACTIONS ─────────────────────────────────────────── */
+    function addItem(type, text) {
+      const item = { id: uid(), type, text: text.trim(), done: false, createdAt: Date.now() };
+      items.unshift(item);
+      save();
+      renderAll();
+    }
+
+    function toggleDone(id) {
+      const item = items.find(i => i.id === id);
+      if (!item) return;
+      item.done = !item.done;
+      save();
+      renderAll();
+    }
+
+    function deleteItem(id) {
+      const idx = items.findIndex(i => i.id === id);
+      if (idx === -1) return;
+      const [removed] = items.splice(idx, 1);
+      undoStack = { item: removed, idx };
+      save();
+      renderAll();
+      showToast('Deleted');
+    }
+
+    function undoDelete() {
+      if (!undoStack) return;
+      items.splice(undoStack.idx, 0, undoStack.item);
+      undoStack = null;
+      save();
+      renderAll();
+      hideToast();
+    }
+
+    /* ─── INLINE EDIT ─────────────────────────────────────── */
+    // FIX: cancelEdit was called but never defined
+    function cancelEdit() {
+      if (!editingId) return;
+      editingId = null;
+      renderAll();
+    }
+
+    function startEdit(id, li) {
+      if (editingId === id) return;
+      // FIX: cancel any existing edit before starting a new one
+      if (editingId) cancelEdit();
+
+      editingId = id;
+      const item = items.find(i => i.id === id);
+      if (!item) return;
+
+      const isNote = item.type === 'note';
+      const textEl = li.querySelector('.item-text');
+
+      // FIX: complete the textarea creation and replacement logic
+      const textarea = document.createElement('textarea');
+      textarea.className = 'item-edit';
+      textarea.value = item.text;
+      textarea.rows = isNote ? 3 : 1;
+
+      // Auto-resize
+      function resize() {
+        textarea.style.height = 'auto';
+        textarea.style.height = textarea.scrollHeight + 'px';
+      }
+      textarea.addEventListener('input', resize);
+
+      // FIX: complete the keydown handler that was cut off mid-function
+      textarea.addEventListener('keydown', e => {
+        if (e.key === 'Escape') {
+          e.preventDefault();
+          cancelEdit();
+          return;
+        }
+        if (isNote) {
+          // Note: Cmd/Ctrl+Enter saves; plain Enter = newline
+          if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+            e.preventDefault();
+            commitEdit(id, textarea.value);
+          }
+        } else {
+          // Task: Enter saves
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            commitEdit(id, textarea.value);
+          }
+        }
+      });
+
+      // Save on blur
+      textarea.addEventListener('blur', () => {
+        // Slight delay to allow click events to fire first
+        setTimeout(() => {
+          if (editingId === id) {
+            commitEdit(id, textarea.value);
+          }
+        }, 150);
+      });
+
+      // Replace the text element with the textarea
+      textEl.replaceWith(textarea);
+      li.classList.add('editing');
+
+      // Focus and resize
+      textarea.focus();
+      // Place cursor at end
+      textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+      resize();
+    }
+
+    function commitEdit(id, newText) {
+      const trimmed = newText.trim();
+      const item = items.find(i => i.id === id);
+      if (!item) { editingId = null; return; }
+
+      // FIX: if text is cleared entirely, delete the item; otherwise save
+      if (!trimmed) {
+        editingId = null;
+        deleteItem(id);
+        return;
+      }
+
+      item.text = trimmed;
+      editingId = null;
+      save();
+      renderAll();
+    }
+
+    /* ─── SEARCH ─────────────────────────────────────────── */
+    document.getElementById('searchInput').addEventListener('input', function () {
+      searchQuery = this.value;
+      document.getElementById('searchClear').classList.toggle('visible', !!this.value);
+      renderAll();
+    });
+
+    document.getElementById('searchClear').addEventListener('click', function () {
+      searchQuery = '';
+      document.getElementById('searchInput').value = '';
+      this.classList.remove('visible');
+      renderAll();
+      document.getElementById('searchInput').focus();
+    });
+
+    /* ─── FAB / PANEL ─────────────────────────────────────── */
+    const fab = document.getElementById('fab');
+    const addPanel = document.getElementById('addPanel');
+    const addText = document.getElementById('addText');
+    const addSubmit = document.getElementById('addSubmit');
+
+    function openPanel() {
+      panelOpen = true;
+      addPanel.classList.add('open');
+      // FIX: toggle FAB rotation state
+      fab.classList.add('open');
+      // Reset to Task type
+      activeType = 'task';
+      document.querySelectorAll('.add-type-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('typeTask').classList.add('active');
+      addText.value = '';
+      addText.style.height = 'auto';
+      addText.placeholder = 'What needs to be done?';
+      document.getElementById('addHint').textContent = 'Enter to save · Esc to close';
+      addSubmit.disabled = true;
+      setTimeout(() => addText.focus(), 60);
+    }
+
+    function closePanel() {
+      panelOpen = false;
+      addPanel.classList.remove('open');
+      // FIX: remove FAB rotation state
+      fab.classList.remove('open');
+      addText.blur();
+    }
+
+    fab.addEventListener('click', () => {
+      // FIX: toggle panel instead of always opening
+      if (panelOpen) { closePanel(); } else { openPanel(); }
+    });
+    document.getElementById('addClose').addEventListener('click', closePanel);
+
+    // Type toggle
+    document.querySelectorAll('.add-type-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.add-type-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeType = btn.dataset.type;
+        if (activeType === 'note') {
+          addText.placeholder = 'Write your note here…';
+          addText.rows = 4;
+          document.getElementById('addHint').textContent = 'Enter for new line · Cmd+Enter to save';
+        } else {
+          addText.placeholder = 'What needs to be done?';
+          addText.rows = 2;
+          document.getElementById('addHint').textContent = 'Enter to save · Esc to close';
+        }
+        addText.style.height = 'auto';
+        addText.focus();
+      });
+    });
+
+    // Input validation
+    addText.addEventListener('input', function () {
+      addSubmit.disabled = !this.value.trim();
+      // auto-resize
+      this.style.height = 'auto';
+      this.style.height = this.scrollHeight + 'px';
+    });
+
+    addText.addEventListener('keydown', e => {
+      if (activeType === 'note') {
+        // Note: Cmd/Ctrl+Enter submits; plain Enter = newline (default)
+        if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); submitItem(); }
+      } else {
+        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submitItem(); }
+      }
+      if (e.key === 'Escape') { closePanel(); }
+    });
+
+    addSubmit.addEventListener('click', submitItem);
+
+    function submitItem() {
+      const text = addText.value.trim();
+      if (!text) return;
+      addItem(activeType, text);
+      closePanel();
+    }
+
+    // Close panel on outside click (clicking the app area behind the panel)
+    document.addEventListener('click', e => {
+      if (panelOpen && !addPanel.contains(e.target) && e.target !== fab) {
+        closePanel();
+      }
+    });
+
+    /* ─── TOAST ───────────────────────────────────────────── */
+    function showToast(msg) {
+      clearTimeout(toastTimer);
+      document.getElementById('toastMsg').textContent = msg;
+      document.getElementById('toast').classList.add('visible');
+      toastTimer = setTimeout(hideToast, 3500);
+    }
+
+    function hideToast() {
+      clearTimeout(toastTimer);
+      document.getElementById('toast').classList.remove('visible');
+    }
+
+    document.getElementById('toastUndo').addEventListener('click', undoDelete);
+
+    /* ─── KEYBOARD SHORTCUTS ──────────────────────────────── */
+    document.addEventListener('keydown', e => {
+      // Cmd/Ctrl+Z to undo delete
+      if ((e.metaKey || e.ctrlKey) && e.key === 'z') {
+        if (undoStack) { e.preventDefault(); undoDelete(); }
+      }
+      // '/' to focus search (when not already in an input)
+      if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+        document.getElementById('searchInput').focus();
+      }
+      // 'n' to open panel (when not already in an input)
+      if (e.key === 'n' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+        if (!panelOpen) openPanel();
+      }
+      // Esc closes panel
+      if (e.key === 'Escape' && panelOpen) closePanel();
+    });
+
+    /* ─── BOOT ────────────────────────────────────────────── */
+    load();
+    renderAll();
+  </script>
+</body>
+
+</html>
 </head>
 <body>
 <div class="app">
@@ -102,4 +1114,4 @@
 
 <script src="script.js"></script>
 </body>
-</html>
+</html> -->
